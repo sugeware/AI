@@ -2,7 +2,7 @@ import cv2
 print(cv2.__version__)
 import numpy as np
 from adafruit_servokit import ServoKit
-kit=ServoKit(channels=16)
+kit = ServoKit(channels=16)
 
 pan=90
 tilt=45
@@ -25,7 +25,6 @@ cv2.createTrackbar('satLow', 'Trackbars',157,255,nothing)
 cv2.createTrackbar('satHigh', 'Trackbars',255,255,nothing)
 cv2.createTrackbar('valLow','Trackbars',100,255,nothing)
 cv2.createTrackbar('valHigh','Trackbars',255,255,nothing)
-
 
 dispW=640
 dispH=480
@@ -108,8 +107,8 @@ while True:
     cv2.imshow('nanoCam',frame)
     cv2.moveWindow('nanoCam',0,0)
     
-
     if cv2.waitKey(1)==ord('q'):
         break
+
 cam.release()
 cv2.destroyAllWindows()
