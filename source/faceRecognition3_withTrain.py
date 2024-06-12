@@ -1,25 +1,40 @@
 import face_recognition
 import os
 import cv2
+import pickle
 print(face_recognition.__version__)
 
+train = False
+
+# -----------Trainning the face recognition models------------
+if train == True:
+    print('Begain to train...')
+    Encodings = []
+    Names = []
+    image_dir = '/home/jetson/Desktop/AI/faceReconimizer/known'
+    for root ,dirs, files in os.walk(image_dir):
+        print(files)q
+        for file in files:
+            path = os.path.join(root,file) # Build file path
+            print(path)
+            name = os.path.splitext(file)[0] # Extract the body ofa file name from a file(without the extension)
+            print(name)
+            person = face_recognition.load_image_file(path) #  Load the image 
+            Encoding = face_recognition.face_encodings(person)[0] # The feature encoding of a face is tetracted from a face image
+            Encodings.append(Encoding)
+            Names.append(name)
+    print(Names)
+
+    with open('/home/jetson/Desktop/AI/models/train2.pkl','wb') as f:
+        pickle.dump(Names,f)
+        pickle.dump(Encodings,f)
+   
 Encodings = []
 Names = []
 
-# -----------Trainning the face recognition models------------
-image_dir = '/home/jetson/Desktop/AI/faceReconimizer/known'
-for root ,dirs, files in os.walk(image_dir):
-    print(files)
-    for file in files:
-        path = os.path.join(root,file) # Build file path
-        print(path)
-        name = os.path.splitext(file)[0] # Extract the body ofa file name from a file(without the extension)
-        print(name)
-        person = face_recognition.load_image_file(path) #  Load the image 
-        Encoding = face_recognition.face_encodings(person)[0] # The feature encoding of a face is tetracted from a face image
-        Encodings.append(Encoding)
-        Names.append(name)
-print(Names)
+with open('/home/jetson/Desktop/AI/models/train2.pkl','rb') as f:
+    Names = pickle.load(f)
+    Encodings = pickle.load(f)
 
 # -----------Face recognition--------------
 font = cv2.FONT_HERSHEY_COMPLEX
