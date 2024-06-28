@@ -5,12 +5,14 @@ import time
 
 cam1 = cv2.VideoCapture(0,cv2.CAP_V4L2)
 cam2 = cv2.VideoCapture(1,cv2.CAP_V4L2)
+
 fpsReport = 0
 startTime = time.time()
 while True:
     ret1,frame1 = cam1.read()
     ret2,frame2 = cam2.read()
-    
+    # print(frame1.shape,frame2.shape)
+        
     if ret1 & ret2 == False:
         print('Fail to open camera')
         

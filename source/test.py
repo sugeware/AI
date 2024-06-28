@@ -1,45 +1,32 @@
-import face_recognition
-import cv2
-import os
-import pickle
+import jetson.inference
+import jetson.utils
 import time
-print(cv2.__version__)
- 
-Encodings=[]
-Names=[]
- 
-with open('/home/jetson/Desktop/AI/models/train2.pkl','rb') as f:
-    Names=pickle.load(f)
-    Encodings=pickle.load(f)
-font=cv2.FONT_HERSHEY_SIMPLEX
+import cv2
+import numpy as np
 
-cam_url = 'rtsp://admin:Su619865277@192.168.110.166/ch1-s1/tcp'
-# cam = cv2.VideoCapture(cam_url)
-# cam = cv2.VideoCapture(0,cv2.CAP_V4L2)
-cam = cv2.VideoCapture(0)
- 
+width=640
+height=480
+cam=jetson.utils.gstCamera(width,height,'/dev/video1')
+# cam=jetson.utils.gstCamera(width,height,'1')
+net=jetson.inference.imageNet('googlenet')
+timeMark=time.time()
+fpsFilter=0
+timeMark=time.time()
+font=cv2.FONT_HERSHEY_SIMPLEX
 while True:
-    _,frame=cam.read()
-    frameSmall=cv2.resize(frame,(0,0),fx=.25,fy=.25)
-    frameRGB=cv2.cvtColor(frameSmall,cv2.COLOR_BGR2RGB)
-    facePositions=face_recognition.face_locations(frameRGB,model='cnn')
-    allEncodings=face_recognition.face_encodings(frameRGB,facePositions)
-    for (top,right,bottom,left),face_encoding in zip(facePositions,allEncodings):
-        name='Unkown Person'
-        matches=face_recognition.compare_faces(Encodings,face_encoding)
-        if True in matches:
-            first_match_index=matches.index(True)
-            name=Names[first_match_index]
-        top=top*4
-        right=right*4
-        bottom=bottom*4
-        left=left*4
-        cv2.rectangle(frame,(left,top),(right, bottom),(0,0,255),2)
-        cv2.putText(frame,name,(left,top-6),font,.75,(0,0,255),2)
-    cv2.imshow('Picture',frame)
-    cv2.moveWindow('Picture',0,0)
+    frame, width, height = cam.CaptureRGBA(zeroCopy=1)
+    classID, confidence = net.Classify(frame, width, height)
+    item = net.GetClassDesc(classID)
+    dt=time.time()-timeMark
+    fps=1/dt
+    fpsFilter=.95*fpsFilter+.05*fps
+    timeMark=time.time()
+    frame=jetson.utils.cudaToNumpy(frame,width,height,4)
+    frame=cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR).astype(np.uint8)
+    cv2.putText(frame,str(round(fpsFilter,1))+'      '+item,(0,30),font,.75,(0,0,255),2)
+    cv2.imshow('webCam',frame)
+    cv2.moveWindow('webCam',0,0)
     if cv2.waitKey(1)==ord('q'):
         break
- 
 cam.release()
 cv2.destroyAllWindows()

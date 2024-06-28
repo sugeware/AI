@@ -44,8 +44,8 @@ font = cv2.FONT_HERSHEY_COMPLEX
 # cam_url = 'rtsp://admin:Su619865277@192.168.110.166/ch1-s1/tcp'
 # cam = cv2.VideoCapture(cam_url)
 cam = cv2.VideoCapture(1,cv2.CAP_V4L2)
-# cv2.namedWindow('picture',cv2.WINDOW_NORMAL)
-# cv2.resizeWindow('picture',640,480)
+cv2.namedWindow('picture',cv2.WINDOW_NORMAL)
+cv2.resizeWindow('picture',640,480)
 timeStamp = time.time()
 
 while True:
